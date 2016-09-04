@@ -12,6 +12,7 @@ package org.eclipse.che.ide.extension.machine.client.processes;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
+import org.eclipse.che.api.core.model.machine.Machine;
 import org.eclipse.che.ide.api.mvp.View;
 
 import javax.validation.constraints.NotNull;
@@ -89,7 +90,7 @@ public interface ConsolesPanelView extends View<ConsolesPanelView.ActionDelegate
          * @param machineId
          *         id of machine in which the terminal will be added
          */
-        void onAddTerminal(@NotNull String workspaceId, @NotNull String machineId);
+        void onAddTerminal(@NotNull Machine machine);
 
         /**
          * Will be called when user clicks 'Preview Ssh' button

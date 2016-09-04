@@ -20,6 +20,7 @@ import org.eclipse.che.ide.api.machine.MachineServiceClient;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.outputconsole.OutputConsole;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.api.workspace.WorkspaceServiceClient;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.MachineResources;
@@ -52,11 +53,12 @@ public class TerminalsPanelPresenter extends ConsolesPanelPresenter {
                                    NotificationManager notificationManager,
                                    MachineLocalizationConstant localizationConstant,
                                    MachineServiceClient machineService,
+                                   WorkspaceServiceClient workspaceService,
                                    MachineResources resources,
                                    AppContext appContext,
                                    ConsoleTreeContextMenuFactory consoleTreeContextMenuFactory) {
         super(view, eventBus, dtoFactory, dialogFactory, entityFactory, terminalFactory, commandConsoleFactory, commandTypeRegistry,
-              workspaceAgent, notificationManager, localizationConstant, machineService, resources, appContext, consoleTreeContextMenuFactory);
+              workspaceAgent, notificationManager, localizationConstant, machineService, workspaceService, resources, appContext, consoleTreeContextMenuFactory);
     }
 
     @Override

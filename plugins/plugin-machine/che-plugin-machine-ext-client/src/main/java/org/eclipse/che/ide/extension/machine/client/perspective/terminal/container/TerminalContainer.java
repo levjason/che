@@ -61,11 +61,11 @@ public class TerminalContainer implements TabPresenter, MachineStateEvent.Handle
             return;
         }
 
-        TerminalPresenter newTerminal = terminalFactory.create(machine);
+//        TerminalPresenter newTerminal = terminalFactory.create(machine);
 
-        terminals.put(machineId, newTerminal);
+//        terminals.put(machineId, newTerminal);
 
-        view.addTerminal(newTerminal);
+//        view.addTerminal(newTerminal);
     }
 
     /** {@inheritDoc} */

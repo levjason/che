@@ -164,10 +164,10 @@ public class ConsolesPanelPresenterTest {
 
         when(appContext.getWorkspaceId()).thenReturn(WORKSPACE_ID);
 
-        presenter =
-                new ConsolesPanelPresenter(view, eventBus, dtoFactory, dialogFactory, entityFactory, terminalFactory, commandConsoleFactory,
-                                           commandTypeRegistry, workspaceAgent, notificationManager, localizationConstant,
-                                           machineService, resources, appContext, consoleTreeContextMenuFactory);
+//        presenter =
+//                new ConsolesPanelPresenter(view, eventBus, dtoFactory, dialogFactory, entityFactory, terminalFactory, commandConsoleFactory,
+//                                           commandTypeRegistry, workspaceAgent, notificationManager, localizationConstant,
+//                                           machineService, resources, appContext, consoleTreeContextMenuFactory);
         PartPresenter parent = mock(PartPresenter.class);
         presenter.setParent(parent);
     }

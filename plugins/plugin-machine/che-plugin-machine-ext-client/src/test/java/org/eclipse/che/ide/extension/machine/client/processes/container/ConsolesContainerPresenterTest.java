@@ -51,7 +51,7 @@ public class ConsolesContainerPresenterTest {
 
     @Before
     public void setUp() {
-        presenter = new ConsolesContainerPresenter(view, consolesPanelPresenter, terminalsPanelPresenter, localizationConstant, resources);
+//        presenter = new ConsolesContainerPresenter(view, consolesPanelPresenter, terminalsPanelPresenter, localizationConstant, resources);
     }
 
     @Test

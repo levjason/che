@@ -35,7 +35,7 @@ import javax.validation.constraints.NotNull;
 public class ConsolesContainerPresenter extends BasePresenter implements ConsolesContainerView.ActionDelegate, HasView {
 
     private final ConsolesPanelPresenter      consolesPanelPresenter;
-    private final TerminalsPanelPresenter     terminalsPanelPresenter;
+//    private final TerminalsPanelPresenter     terminalsPanelPresenter;
     private final MachineLocalizationConstant localizationConstant;
     private final ConsolesContainerView       view;
     private final MachineResources            resources;
@@ -43,19 +43,19 @@ public class ConsolesContainerPresenter extends BasePresenter implements Console
     @Inject
     public ConsolesContainerPresenter(ConsolesContainerView view,
                                       ConsolesPanelPresenter consolesPanelPresenter,
-                                      TerminalsPanelPresenter terminalsPanelPresenter,
+//                                      TerminalsPanelPresenter terminalsPanelPresenter,
                                       MachineLocalizationConstant localizationConstant,
                                       MachineResources resources) {
         this.view = view;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.terminalsPanelPresenter = terminalsPanelPresenter;
+//        this.terminalsPanelPresenter = terminalsPanelPresenter;
         this.localizationConstant = localizationConstant;
         this.resources = resources;
 
         this.view.setDelegate(this);
         this.view.setTitle(localizationConstant.viewConsolesTitle());
         consolesPanelPresenter.setParent(this);
-        terminalsPanelPresenter.setParent(this);
+//        terminalsPanelPresenter.setParent(this);
     }
 
     @Override
@@ -101,13 +101,13 @@ public class ConsolesContainerPresenter extends BasePresenter implements Console
     public void onSplitVerticallyClick() {
         view.splitVertically();
         consolesPanelPresenter.go(view.getProcessesContainer());
-        terminalsPanelPresenter.go(view.getTerminalsContainer());
+//        terminalsPanelPresenter.go(view.getTerminalsContainer());
     }
 
     @Override
     public void onSplitHorizontallyClick() {
         view.splitHorizontally();
         consolesPanelPresenter.go(view.getProcessesContainer());
-        terminalsPanelPresenter.go(view.getTerminalsContainer());
+//        terminalsPanelPresenter.go(view.getTerminalsContainer());
     }
 }
