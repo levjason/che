@@ -34,7 +34,7 @@ public class MachineSourceImpl implements MachineSource {
     @Basic
     private String location;
 
-    @Basic
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     public MachineSourceImpl() {}
