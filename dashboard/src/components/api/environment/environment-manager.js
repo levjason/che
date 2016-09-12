@@ -17,7 +17,15 @@
 export class EnvironmentManager {
 
   constructor() {
-    this.WS_AGENT_NAME = 'ws-agent';
+    this.WS_AGENT_NAME = 'org.eclipse.che.ws-agent';
+  }
+
+  get canDeleteMachine() {
+    return false;
+  }
+
+  get canEditEnvVariables() {
+    return false;
   }
 
   /**
@@ -38,7 +46,18 @@ export class EnvironmentManager {
    * @returns environment's configuration
    */
   getEnvironment(environment, machines) {
-    return {};
+    machines.forEach((machine) => {
+      let machineName = machine.name;
+
+      if (angular.isUndefined(environment.machines[machineName])) {
+        environment.machines[machineName] = {'attributes': {}};
+      }
+      environment.machines[machineName].attributes.memoryLimitBytes = machine.attributes.memoryLimitBytes;
+      environment.machines[machineName].agents = angular.copy(machine.agents);
+      environment.machines[machineName].servers = angular.copy(machine.servers);
+    });
+
+    return environment;
   }
 
   /**
@@ -48,7 +67,7 @@ export class EnvironmentManager {
    * @returns {*}
    */
   isDev(machine) {
-    return machine.agents && machine.agents.includes(this.WS_AGENT_NAME);
+    return machine && machine.agents && machine.agents.includes(this.WS_AGENT_NAME);
   }
 
   /**
@@ -70,12 +89,24 @@ export class EnvironmentManager {
     }
   }
 
-  getServers() {
-    //TODO
+  getServers(machine) {
+    if (machine && machine.servers) {
+      return machine.servers;
+    }
+
+    return {};
   }
 
-  setServer() {
-    //TODO
+  setServers(machine, servers) {
+    machine.servers = angular.copy(servers);
+  }
+
+  getMemoryLimit(machine) {
+    if (machine && machine.attributes && machine.attributes.memoryLimitBytes) {
+      return machine.attributes.memoryLimitBytes;
+    }
+
+    return -1;
   }
 
   /**
@@ -88,5 +119,10 @@ export class EnvironmentManager {
   setMemoryLimit(machine, limit) {
     machine.attributes = machine.attributes ? machine.attributes : {};
     machine.attributes.memoryLimitBytes = limit;
+  }
+
+  renameMachine(environment, oldName, newName) {
+    environment.machines[newName] = environment.machines[oldName];
+    delete environment.machines[oldName];
   }
 }

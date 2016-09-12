@@ -23,7 +23,54 @@ export class ComposeEnvironmentManager extends EnvironmentManager {
 
   constructor() {
     super();
+
     //TODO define compose specific stuff
+  }
+
+  get editorMode() {
+    return 'text/x-yaml';
+  }
+
+  get canEditEnvVariables() {
+    return true;
+  }
+
+  get canDeleteMachine() {
+    return true;
+  }
+
+  /**
+   * Parses recipe content
+   *
+   * @param content {string} recipe content
+   * @returns {object} recipe object
+   */
+  _parseRecipe(content) {
+    let recipe = {};
+    try {
+      recipe = jsyaml.load(content);
+    } catch (e) {
+      console.error(e);
+    }
+    return recipe;
+  }
+
+  /**
+   * Dumps recipe object
+   *
+   * @param recipe {object} recipe object
+   * @returns {string} recipe content
+   */
+
+  _stringifyRecipe(recipe) {
+    let content = '';
+    try {
+      content = jsyaml.dump(recipe);
+    } catch (e) {
+      console.error(e);
+    }
+
+    return content;
   }
 
   /**
@@ -33,7 +80,24 @@ export class ComposeEnvironmentManager extends EnvironmentManager {
    * @returns {Array} list of machines defined in environment
    */
   getMachines(environment) {
-    return [];
+    let recipe = this._parseRecipe(environment.recipe.content);
+
+    let machines = [];
+
+    Object.keys(recipe.services).forEach((machineName) => {
+      let machine = angular.copy(environment.machines[machineName]) || {};
+      machine.name = machineName;
+      machine.recipe = recipe.services[machineName];
+
+      // memory
+      let memoryLimitBytes = this.getMemoryLimit(machine);
+      if (memoryLimitBytes === -1) {
+        this.setMemoryLimit(machine, recipe.services[machineName].mem_limit);
+      }
+      machines.push(machine);
+    });
+
+    return machines;
   }
 
   /**
@@ -44,6 +108,110 @@ export class ComposeEnvironmentManager extends EnvironmentManager {
    * @returns environment's configuration
    */
   getEnvironment(environment, machines) {
-    return {};
+    super.getEnvironment(environment, machines);
+
+    let recipe = this._parseRecipe(environment.recipe.content);
+    machines.forEach((machine) => {
+      let machineName = machine.name;
+      if (machine.recipe.environment && Object.keys(machine.recipe.environment).length) {
+        recipe.services[machineName].environment = angular.copy(machine.recipe.environment);
+      } else {
+        delete recipe.services[machineName].environment;
+      }
+    });
+    try {
+      environment.recipe.content = this._stringifyRecipe(recipe);
+    } catch (e) {
+      console.error('Cannot update environment\'s recipe, error: ', e);
+    }
+
+    return environment;
+  }
+
+  getSource(machine) {
+    if (machine.recipe.image) {
+      return machine.recipe.image;
+    } else {
+      // TODO get source from build context
+    }
+  }
+
+  getEnvVariables(machine) {
+    return machine.recipe.environment || {};
+  }
+
+  setEnvVariables(machine, envVariables) {
+    if (Object.keys(envVariables).length) {
+      machine.recipe.environment = angular.copy(envVariables);
+    } else {
+      delete machine.recipe.environment;
+    }
+  }
+
+  renameMachine(environment, oldName, newName) {
+    try {
+      let recipe = this._parseRecipe(environment.recipe.content);
+
+      // fix relations to other machines in recipe
+      Object.keys(recipe.services).forEach((serviceName) => {
+        if (serviceName === oldName) {
+          return;
+        }
+        let dependsOn = recipe.services[serviceName].depends_on || [],
+            index = dependsOn.indexOf(oldName);
+        if (index > -1) {
+          dependsOn.splice(index, 1);
+          dependsOn.push(newName);
+        }
+      });
+
+      // rename machine in recipe
+      recipe.services[newName] = recipe.services[oldName];
+      delete recipe.services[oldName];
+
+      // try to update recipe
+      environment.recipe.content = this._stringifyRecipe(recipe);
+
+      // and then update config
+      super.renameMachine(environment, oldName, newName);
+    } catch (e) {
+      console.error('Cannot rename machine, error: ', e);
+    }
+
+    return environment;
+  }
+
+  deleteMachine(environment, name) {
+    try {
+      let recipe = this._parseRecipe(environment.recipe.content);
+
+      // fix relations to other machines in recipe
+      Object.keys(recipe.services).forEach((serviceName) => {
+        if (serviceName === name) {
+          return;
+        }
+        let dependsOn = recipe.services[serviceName].depends_on || [],
+            index = dependsOn.indexOf(name);
+        if (index > -1) {
+          dependsOn.splice(index, 1);
+          if (dependsOn.length === 0) {
+            delete recipe.services[serviceName].depends_on;
+          }
+        }
+      });
+
+      // delete machine from recipe
+      delete recipe.services[name];
+
+      // try to update recipe
+      environment.recipe.content = this._stringifyRecipe(recipe);
+
+      // and then update config
+      delete environment.machines[name];
+    } catch (e) {
+      console.error('Cannot delete machine, error: ', e);
+    }
+
+    return environment;
   }
 }
